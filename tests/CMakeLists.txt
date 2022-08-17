@@ -12,3 +12,4 @@ foreach(name ${test_list})
 	add_test(${name}_test ${name})
 endforeach()
 
+include(CTest)

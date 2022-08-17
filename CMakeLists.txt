@@ -6,7 +6,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
 	#target_compile_definitions(${PROJECT_NAME} PRIVATE "-O0")
-	set(CMAKE_CXX_FLAGS "-O0")
+	#set(CMAKE_CXX_FLAGS "-O0")
 endif()
 
 find_package(uv REQUIRED)
@@ -42,11 +42,14 @@ add_subdirectory(tests)
 
 set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "cpphttpx.org/repos/uvbind")
 
+set(inst_rtdir lib)
+set(inc_dest include)
+set(lib_dest lib)
 include(CMakePackageConfigHelpers)
 configure_package_config_file(
 	cmake/config.cmake.in
 	"${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake"
-	INSTALL_DESTINATION lib
+	INSTALL_DESTINATION ${lib_dest}
 	)
 write_basic_package_version_file(
 	"${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-version.cmake"
@@ -54,18 +57,24 @@ write_basic_package_version_file(
 	COMPATIBILITY SameMajorVersion
 	)
 
-install(
+INSTALL(
 	TARGETS ${PROJECT_NAME}
-	EXPORT ${POJECT_NAME}-export
-	LIBRARY DESTINATION  lib
+	EXPORT ${PROJECT_NAME}-export
+	LIBRARY DESTINATION  ${lib_dest}
 	PUBLIC_HEADER DESTINATION include
 	COMPONENT "${PROJECT_NAME}"
-	)
-#INSTALL (
-#DIRECTORY ${CMAKE_SOURCE_DIR}/include/
-#DESTINATION include
-#FILES_MATCHING PATTERN "*.h*"
-#)
+)
+INSTALL (
+	DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/uvbind/
+	DESTINATION ${inc_dest}/uvbind
+	COMPONENT "${PROJECT_NAME}-dev"
+	FILES_MATCHING REGEX "^.*.h(pp)?$"
+)
+INSTALL (
+	EXPORT ${PROJECT_NAME}-export
+	DESTINATION  ${lib_dest}
+	COMPONENT "${PROJECT_NAME}"
+)
 
 install(FILES
 	"${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake"
